@@ -1,6 +1,7 @@
 package com.ahmad.hogwartsartifactsonline.artifact;
 
 import com.ahmad.hogwartsartifactsonline.artifact.utils.IdWorker;
+import com.ahmad.hogwartsartifactsonline.system.exception.ObjectNotFoundException;
 import com.ahmad.hogwartsartifactsonline.wizard.Wizard;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -98,8 +99,8 @@ class ArtifactServiceTest {
         });
 
         assertThat(thrown)
-                .isInstanceOf(ArtifactNotFoundException.class)
-                .hasMessage("Could not found artifact with Id 12345 :(");
+                .isInstanceOf(ObjectNotFoundException.class)
+                .hasMessage("Could not find artifact With Id 12345 :(");
 
 
         verify(artifactRepository, times(1)).findById("12345");
@@ -151,7 +152,7 @@ class ArtifactServiceTest {
         oldArtifact.setImageUrl("imageUrl");
 
         Artifact update = new Artifact();
-        update.setId("1234");
+       // update.setId("1234");                      edit: The should not send the id
         update.setName("Artifact 3");
         update.setDescription(" new Description");
         update.setImageUrl("imageUrl");
@@ -161,7 +162,7 @@ class ArtifactServiceTest {
 
         Artifact updatedArtifact = artifactService.update("1234", update);
 
-        assertThat(updatedArtifact.getId()).isEqualTo(update.getId());
+        assertThat(updatedArtifact.getId()).isEqualTo("1234");
         assertThat(updatedArtifact.getDescription()).isEqualTo(update.getDescription());
 
         verify(artifactRepository, times(1)).findById(oldArtifact.getId());
@@ -183,7 +184,7 @@ class ArtifactServiceTest {
         given(artifactRepository.findById(Mockito.any(String.class))).willReturn(Optional.empty());
 
 
-        assertThrows(ArtifactNotFoundException.class, () -> {
+        assertThrows(ObjectNotFoundException.class, () -> {
             artifactService.update("1234", update);
         });
 
@@ -214,7 +215,7 @@ class ArtifactServiceTest {
 
         given(artifactRepository.findById(Mockito.any(String.class))).willReturn(Optional.empty());
 
-        assertThrows(ArtifactNotFoundException.class, () -> artifactService.delete("2"));
+        assertThrows(ObjectNotFoundException.class, () -> artifactService.delete("2"));
 
 
         verify(artifactRepository,times(1)).findById("2");

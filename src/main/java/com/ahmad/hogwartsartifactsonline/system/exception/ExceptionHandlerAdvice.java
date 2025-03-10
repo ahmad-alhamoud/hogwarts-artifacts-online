@@ -1,6 +1,5 @@
 package com.ahmad.hogwartsartifactsonline.system.exception;
 
-import com.ahmad.hogwartsartifactsonline.artifact.ArtifactNotFoundException;
 import com.ahmad.hogwartsartifactsonline.system.Result;
 import com.ahmad.hogwartsartifactsonline.system.StatusCode;
 import org.springframework.http.HttpStatus;
@@ -19,9 +18,9 @@ import java.util.Map;
 public class ExceptionHandlerAdvice {
 
 
-    @ExceptionHandler(ArtifactNotFoundException.class)
+    @ExceptionHandler(ObjectNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    Result handleArtifactNotFoundException(ArtifactNotFoundException exception) {
+    Result handleObjectNotFoundException(ObjectNotFoundException exception) {
         return new Result(
                 false,
                 StatusCode.NOT_FOUND,
@@ -41,6 +40,7 @@ public class ExceptionHandlerAdvice {
         });
         return new Result(false, StatusCode.INVALID_ARGUMENT, "Provided arguments are invalid, see data for details.", map);
     }
+
 
 
 }

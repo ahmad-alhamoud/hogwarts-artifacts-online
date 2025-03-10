@@ -34,8 +34,7 @@ public class DBDataInitializer implements CommandLineRunner {
         a2.setDescription("An invisibility cloak is used to make the wearer invisible.");
         a2.setImageUrl("ImageUrl");
 
-        Artifact a3 = new Artifact();
-        a3.setId("1250808601744904193");
+        Artifact a3 = new Artifact();a3.setId("1250808601744904193");
         a3.setName("Elder Wand");
         a3.setDescription("The Elder Wand, known throughout history as the Deathstick or the Wand of Destiny, is an extremely powerful wand made of elder wood with a core of Thestral tail hair.");
         a3.setImageUrl("ImageUrl");
@@ -59,19 +58,19 @@ public class DBDataInitializer implements CommandLineRunner {
         a6.setImageUrl("ImageUrl");
 
         Wizard w1 = new Wizard();
-        w1.setId(1);
+     //   w1.setId(1);
         w1.setName("Albus Dumbledore");
         w1.addArtifact(a1);
         w1.addArtifact(a3);
 
         Wizard w2 = new Wizard();
-        w2.setId(2);
+      //  w2.setId(2);
         w2.setName("Harry Potter");
         w2.addArtifact(a2);
         w2.addArtifact(a4);
 
         Wizard w3 = new Wizard();
-        w3.setId(3);
+      //  w3.setId(3);
         w3.setName("Neville Longbottom");
         w3.addArtifact(a5);
 

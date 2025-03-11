@@ -41,7 +41,7 @@ public class WizardController {
         Wizard savedWizard = wizardService.add(wizard);
         WizardDto updatedDto = wizardToWizardDtoConverter.convert(savedWizard);
 
-        return new Result(true,StatusCode.SUCCESS,"Add Wizard Success",updatedDto);
+        return new Result(true, StatusCode.SUCCESS, "Add Wizard Success", updatedDto);
     }
 
     @GetMapping("/{wizardId}")
@@ -67,5 +67,11 @@ public class WizardController {
     public Result deleteWizardById(@PathVariable Integer wizardId) {
         wizardService.deleteWizardById(wizardId);
         return new Result(true, StatusCode.SUCCESS, "Delete Wizard Success");
+    }
+
+    @PutMapping("/{wizardId}/artifacts/{artifactId}")
+    public Result assignArtifact(@PathVariable Integer wizardId, @PathVariable String artifactId) {
+        wizardService.assignArtifact(wizardId, artifactId);
+        return new Result(true, StatusCode.SUCCESS, "Artifact Assignment Success");
     }
 }

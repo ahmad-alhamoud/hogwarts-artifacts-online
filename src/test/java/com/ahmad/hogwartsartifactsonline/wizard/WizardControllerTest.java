@@ -97,7 +97,7 @@ class WizardControllerTest {
         given(wizardService.findall()).willReturn(wizards);
 
         mvc.perform(
-                        get(baseUrl+"/wizards")
+                        get(baseUrl + "/wizards")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.flag").value(true))
@@ -122,7 +122,7 @@ class WizardControllerTest {
 
 
         mvc.perform(
-                        get(baseUrl+"/wizards/1")
+                        get(baseUrl + "/wizards/1")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.flag").value(true))
@@ -139,7 +139,7 @@ class WizardControllerTest {
         given(wizardService.findById(Mockito.any(Integer.class))).willThrow(new ObjectNotFoundException("wizard", 2));
 
         mvc.perform(
-                        get(baseUrl+"/wizards/2")
+                        get(baseUrl + "/wizards/2")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.flag").value(false))
@@ -155,7 +155,7 @@ class WizardControllerTest {
         doNothing().when(wizardService).deleteWizardById(2);
 
         mvc.perform(
-                        delete(baseUrl+"/wizards/2")
+                        delete(baseUrl + "/wizards/2")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.flag").value(true))
@@ -170,7 +170,7 @@ class WizardControllerTest {
         doThrow(new ObjectNotFoundException("wizard", 5)).when(wizardService).deleteWizardById(5);
 
         mvc.perform(
-                        delete(baseUrl+"/wizards/5")
+                        delete(baseUrl + "/wizards/5")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.flag").value(false))
@@ -195,7 +195,7 @@ class WizardControllerTest {
 
 
         mvc.perform(
-                        put(baseUrl+"/wizards/1")
+                        put(baseUrl + "/wizards/1")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(json)
@@ -221,7 +221,7 @@ class WizardControllerTest {
         String json = objectMapper.writeValueAsString(wizardDto);
 
         mvc.perform(
-                        put(baseUrl+"/wizards/1")
+                        put(baseUrl + "/wizards/1")
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json)
@@ -248,7 +248,7 @@ class WizardControllerTest {
 
 
         mvc.perform(
-                        post(baseUrl+"/wizards")
+                        post(baseUrl + "/wizards")
                                 .content(json)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
@@ -259,5 +259,54 @@ class WizardControllerTest {
                 .andExpect(jsonPath("$.data.id").isNotEmpty())
                 .andExpect(jsonPath("$.data.name").value(wizardDto.name()));
 
+    }
+
+    @Test
+    void testAssignArtifactSuccess() throws Exception {
+
+        doNothing().when(wizardService).assignArtifact(1, "100");
+
+        mvc.perform(
+                        put(baseUrl + "/wizards/1/artifacts/100")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Artifact Assignment Success"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void testAssignArtifactErrorWithNonExistentWizardId() throws Exception {
+
+        doThrow(new ObjectNotFoundException("wizard", 1)).when(wizardService).assignArtifact(1, "125");
+
+        mvc.perform(
+                        put(baseUrl + "/wizards/1/artifacts/125")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
+                .andExpect(jsonPath("$.message").value("Could not find wizard With Id 1 :("))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void testAssignArtifactErrorWithNonExistentArtifactId() throws Exception {
+
+        doThrow(new ObjectNotFoundException("artifact", "125")).when(wizardService)
+                .assignArtifact(5, "125");
+
+        mvc.perform(
+                        put(baseUrl + "/wizards/5/artifacts/125")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
+                .andExpect(jsonPath("$.message").value("Could not find artifact With Id 125 :("))
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 }

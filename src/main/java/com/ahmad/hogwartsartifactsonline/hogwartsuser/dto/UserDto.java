@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 public record UserDto(
         Integer id,
 
-        @NotEmpty(message = "usename are required.")
+        @NotEmpty(message = "username are required.")
         String username,
 
         boolean enabled,

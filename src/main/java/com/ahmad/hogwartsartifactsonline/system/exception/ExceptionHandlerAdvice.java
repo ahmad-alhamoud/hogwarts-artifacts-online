@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.validation.FieldError;
@@ -44,6 +45,12 @@ public class ExceptionHandlerAdvice {
         return new Result(false, StatusCode.INVALID_ARGUMENT, "Provided arguments are invalid, see data for details.", map);
     }
 
+
+    @ExceptionHandler(InsufficientAuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    Result handelInsufficientAuthenticationException(InsufficientAuthenticationException exception) {
+        return new Result(false, StatusCode.UNAUTHORIZED, "Login credentials are missing.", exception.getMessage());
+    }
 
     @ExceptionHandler({UsernameNotFoundException.class, BadCredentialsException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

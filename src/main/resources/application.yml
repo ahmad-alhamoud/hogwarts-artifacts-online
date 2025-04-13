@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: dev # By default, the active profile is  "dev". During Production, it will be replaced to "prod" due to Azure's  environment variables.
+  web:
+    resources:
+      add-mappings: false
 
 api:
   endpoint:

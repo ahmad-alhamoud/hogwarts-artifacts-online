@@ -15,7 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -68,6 +68,12 @@ public class ExceptionHandlerAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     Result handelInvalidBearerTokenException(InvalidBearerTokenException exception) {
         return new Result(false, StatusCode.UNAUTHORIZED, "The access token provided is expired, revoked, or invalid for other reasons.", exception.getMessage());
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    Result handleNoHandlerFoundException(NoHandlerFoundException exception) {
+        return new Result(false, StatusCode.NOT_FOUND, "This API endpoint is not found.", exception.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)

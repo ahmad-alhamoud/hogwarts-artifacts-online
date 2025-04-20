@@ -5,5 +5,7 @@ spring:
     password:
   jpa:
     show-sql: true
-
-
+ai:
+  openai:
+    endpoint: ${AI_OPENAI_ENDPOINT:https://api.openai.com/v1/chat/completions}
+    api-key: ${AI_OPENAI_KEY:YOUR_API_KEY}

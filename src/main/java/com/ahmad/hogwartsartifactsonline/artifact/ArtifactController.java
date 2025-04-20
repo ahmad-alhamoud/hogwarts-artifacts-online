@@ -5,6 +5,7 @@ import com.ahmad.hogwartsartifactsonline.artifact.converter.ArtifactToArtifactDt
 import com.ahmad.hogwartsartifactsonline.artifact.dto.ArtifactDto;
 import com.ahmad.hogwartsartifactsonline.system.Result;
 import com.ahmad.hogwartsartifactsonline.system.StatusCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ public class ArtifactController {
     private final ArtifactService artifactService;
     private final ArtifactToArtifactDtoConverter artifactToArtifactDtoConverter;
     private final ArtifactDtoToArtifactConverter artifactDtoToArtifactConverter;
+
     public ArtifactController(ArtifactService artifactService, ArtifactToArtifactDtoConverter artifactDtoConverter, ArtifactDtoToArtifactConverter artifactDtoToArtifactConverter) {
         this.artifactService = artifactService;
         this.artifactToArtifactDtoConverter = artifactDtoConverter;
@@ -61,5 +63,15 @@ public class ArtifactController {
     public Result deleteArtifact(@PathVariable String artifactId) {
         artifactService.delete(artifactId);
         return new Result(true, StatusCode.SUCCESS, "Delete Artifact Success");
+    }
+
+    @GetMapping("/summary")
+    public Result summarizeArtifacts() throws JsonProcessingException {
+        List<Artifact> foundArtifacts = artifactService.findAll();
+        List<ArtifactDto> artifactDtos = foundArtifacts.stream()
+                .map(artifactToArtifactDtoConverter::convert).collect(Collectors.toList());
+
+        String artifactSummary = artifactService.summarize(artifactDtos);
+        return new Result(true, StatusCode.SUCCESS, "Summarize Success", artifactSummary);
     }
 }

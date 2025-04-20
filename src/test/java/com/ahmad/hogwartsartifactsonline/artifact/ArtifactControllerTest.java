@@ -3,6 +3,7 @@ package com.ahmad.hogwartsartifactsonline.artifact;
 import com.ahmad.hogwartsartifactsonline.artifact.dto.ArtifactDto;
 import com.ahmad.hogwartsartifactsonline.system.StatusCode;
 import com.ahmad.hogwartsartifactsonline.system.exception.ObjectNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -105,7 +106,7 @@ class ArtifactControllerTest {
         given(artifactService.findArtifactById("1250808601744904191")).willReturn(artifacts.get(0));
 
         mvc.perform(
-                        get(baseUrl+"/artifacts/1250808601744904191")
+                        get(baseUrl + "/artifacts/1250808601744904191")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
@@ -124,7 +125,7 @@ class ArtifactControllerTest {
         given(artifactService.findArtifactById("125")).willThrow(new ObjectNotFoundException("artifact", 125));
 
         mvc.perform(
-                        get(baseUrl+"/artifacts/125")
+                        get(baseUrl + "/artifacts/125")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
 
@@ -143,7 +144,7 @@ class ArtifactControllerTest {
         given(artifactService.findAll()).willReturn(artifacts);
 
         mvc.perform(
-                        get(baseUrl+"/artifacts")
+                        get(baseUrl + "/artifacts")
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -175,7 +176,7 @@ class ArtifactControllerTest {
         given(artifactService.save(Mockito.any(Artifact.class))).willReturn(savedArtifact);
 
         mvc.perform(
-                        post(baseUrl+"/artifacts")
+                        post(baseUrl + "/artifacts")
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json)
@@ -209,7 +210,7 @@ class ArtifactControllerTest {
         String json = objectMapper.writeValueAsString(artifactDto);
 
         mvc.perform(
-                        put(baseUrl+"/artifacts/123")
+                        put(baseUrl + "/artifacts/123")
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json)
@@ -234,7 +235,7 @@ class ArtifactControllerTest {
 
         String json = objectMapper.writeValueAsString(artifactDto);
         mvc.perform(
-                        put(baseUrl+"/artifacts/123")
+                        put(baseUrl + "/artifacts/123")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(json)
@@ -252,7 +253,7 @@ class ArtifactControllerTest {
         doNothing().when(artifactService).delete("1");
 
         mvc.perform(
-                        delete(baseUrl+"/artifacts/1")
+                        delete(baseUrl + "/artifacts/1")
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -269,7 +270,7 @@ class ArtifactControllerTest {
         doThrow(new ObjectNotFoundException("artifact", 2)).when(artifactService).delete("2");
 
         mvc.perform(
-                        delete(baseUrl+"/artifacts/2")
+                        delete(baseUrl + "/artifacts/2")
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -277,6 +278,17 @@ class ArtifactControllerTest {
                 .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
                 .andExpect(jsonPath("$.message").value("Could not find artifact With Id 2 :("))
                 .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void testSummarizeArtifactsSuccess() throws Exception {
+        given(artifactService.summarize(Mockito.anyList())).willReturn("The summary includes six artifacts, owned by three different wizards.");
+
+        mvc.perform(get(this.baseUrl + "/artifacts/summary").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Summarize Success"))
+                .andExpect(jsonPath("$.data").value("The summary includes six artifacts, owned by three different wizards."));
     }
 
 }

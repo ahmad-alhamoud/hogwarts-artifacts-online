@@ -7,6 +7,8 @@ import com.ahmad.hogwartsartifactsonline.system.Result;
 import com.ahmad.hogwartsartifactsonline.system.StatusCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,11 +37,11 @@ public class ArtifactController {
 
 
     @GetMapping
-    public Result findAllArtifacts() {
-        List<Artifact> foundArtifacts = artifactService.findAll();
-        List<ArtifactDto> artifactDtos = foundArtifacts.stream()
-                .map(artifactToArtifactDtoConverter::convert).collect(Collectors.toList());
-        return new Result(true, StatusCode.SUCCESS, "Find All Success", artifactDtos);
+    public Result findAllArtifacts(Pageable pageable) {
+        Page<Artifact> artifactPage = artifactService.findAll(pageable);
+        Page<ArtifactDto> artifactDtoPage = artifactPage
+                .map(artifactToArtifactDtoConverter::convert);
+        return new Result(true, StatusCode.SUCCESS, "Find All Success", artifactDtoPage);
     }
 
     @PostMapping

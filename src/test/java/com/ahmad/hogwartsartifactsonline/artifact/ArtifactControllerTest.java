@@ -1,6 +1,7 @@
 package com.ahmad.hogwartsartifactsonline.artifact;
 
 import com.ahmad.hogwartsartifactsonline.artifact.dto.ArtifactDto;
+import com.ahmad.hogwartsartifactsonline.client.imagestorage.ImageStorageClient;
 import com.ahmad.hogwartsartifactsonline.system.StatusCode;
 import com.ahmad.hogwartsartifactsonline.system.exception.ObjectNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +42,9 @@ class ArtifactControllerTest {
 
     @Autowired
     MockMvc mvc;
+
+    @MockitoBean
+    ImageStorageClient imageStorageClient;
 
     @Autowired
     ObjectMapper objectMapper;

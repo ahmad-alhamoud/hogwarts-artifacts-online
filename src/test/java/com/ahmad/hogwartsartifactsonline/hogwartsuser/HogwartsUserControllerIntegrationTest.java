@@ -71,8 +71,9 @@ class HogwartsUserControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Check findUserById (GET)")
-    void testFindUserByIdSuccess() throws Exception {
+    @DisplayName("Check findUserById (GET): User with ROLE_admin Accessing any User's Info")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    void testFindUserByIdWithAdminAccessingAnyUserInfo() throws Exception {
         mvc.perform(
                         get(baseUrl + "/users/2")
                                 .accept(MediaType.APPLICATION_JSON)
@@ -84,6 +85,51 @@ class HogwartsUserControllerIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Find User By Id Success"))
                 .andExpect(jsonPath("$.data.username").value("eric"));
     }
+
+    @Test
+    @DisplayName("Check findUserById (GET): User with ROLE_user Accessing own Info")
+    void testFindUserByIdWithUserAccessingOwnInfo() throws Exception {
+
+        ResultActions resultActions = mvc.perform(post(baseUrl + "/users/login").with(httpBasic("eric", "654321")));
+        MvcResult mvcResult = resultActions.andDo(print()).andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        JSONObject json = new JSONObject(contentAsString);
+        String ericToken = "Bearer " + json.getJSONObject("data").getString("token");
+
+        mvc.perform(
+                        get(baseUrl + "/users/2")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, ericToken)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Find User By Id Success"))
+                .andExpect(jsonPath("$.data.username").value("eric"));
+    }
+
+    @Test
+    @DisplayName("Check findUserById (GET): User with ROLE_user Accessing Another Users Info")
+    void testFindUserByIdWithUserAccessingAnotherUserSInfo() throws Exception {
+
+        ResultActions resultActions = mvc.perform(post(baseUrl + "/users/login").with(httpBasic("eric", "654321")));
+        MvcResult mvcResult = resultActions.andDo(print()).andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        JSONObject json = new JSONObject(contentAsString);
+        String ericToken = "Bearer " + json.getJSONObject("data").getString("token");
+
+        mvc.perform(
+                        get(baseUrl + "/users/1")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, ericToken)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.FORBIDDEN))
+                .andExpect(jsonPath("$.message").value("No Permission."))
+                .andExpect(jsonPath("$.data").value("Access Denied"));
+    }
+
 
     @Test
     @DisplayName("Check findUserById with non-existent id (GET)")
@@ -177,13 +223,13 @@ class HogwartsUserControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Check updateUser with valid input (PUT)")
-    void testUpdateUserSuccess() throws Exception {
-        UserDto update = new UserDto(null, "newName", false, "user");
+    @DisplayName("Check updateUser with valid input (PUT): User with ROLE_admin Updating Any User's Info")
+    void testUpdateUserWithAdminUpdatingAnyUsersInfo() throws Exception {
+        UserDto update = new UserDto(null, "tom123", false, "user");
         String json = objectMapper.writeValueAsString(update);
 
         mvc.perform(
-                        put(baseUrl + "/users/1")
+                        put(baseUrl + "/users/3")
                                 .accept(MediaType.APPLICATION_JSON)
                                 .header(HttpHeaders.AUTHORIZATION, token)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -192,16 +238,71 @@ class HogwartsUserControllerIntegrationTest {
                 .andExpect(jsonPath("$.flag").value(true))
                 .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
                 .andExpect(jsonPath("$.message").value("Update User Success"))
-                .andExpect(jsonPath("$.data.username").value("newName"))
+                .andExpect(jsonPath("$.data.username").value("tom123"))
                 .andExpect(jsonPath("$.data.enabled").value(false))
                 .andExpect(jsonPath("$.data.roles").value("user"));
     }
 
     @Test
+    @DisplayName("Check updateUser with valid input (PUT): User with ROLE_user Updating Own Info")
+    void testUpdateUserWithUserUpdatingOwnInfo() throws Exception {
+
+        ResultActions resultActions = mvc.perform(post(baseUrl + "/users/login").with(httpBasic("eric", "654321")));
+        MvcResult mvcResult = resultActions.andDo(print()).andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        JSONObject json = new JSONObject(contentAsString);
+        String ericToken = "Bearer " + json.getJSONObject("data").getString("token");
+
+        UserDto update = new UserDto(null, "eric123", true, "user");
+        String updatedJson = objectMapper.writeValueAsString(update);
+
+        mvc.perform(
+                        put(baseUrl + "/users/2")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, ericToken)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(updatedJson)
+                )
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Update User Success"))
+                .andExpect(jsonPath("$.data.username").value("eric123"))
+                .andExpect(jsonPath("$.data.enabled").value(true))
+                .andExpect(jsonPath("$.data.roles").value("user"));
+    }
+
+    @Test
+    @DisplayName("Check updateUser with valid input (PUT): User with ROLE_user Updating Another Users Info")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    void testUpdateUserWithUserUpdatingAnotherUsersInfo() throws Exception {
+        ResultActions resultActions = mvc.perform(post(baseUrl + "/users/login").with(httpBasic("eric", "654321")));
+        MvcResult mvcResult = resultActions.andDo(print()).andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        JSONObject json = new JSONObject(contentAsString);
+        String ericToken = "Bearer " + json.getJSONObject("data").getString("token");
+
+        UserDto update = new UserDto(null, "tom123", false, "user");
+        String updatedJson = objectMapper.writeValueAsString(update);
+
+        mvc.perform(
+                        put(baseUrl + "/users/3")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, ericToken)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(updatedJson)
+                )
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.FORBIDDEN))
+                .andExpect(jsonPath("$.message").value("No Permission."))
+                .andExpect(jsonPath("$.data").value("Access Denied"));
+    }
+
+
+    @Test
     @DisplayName("Check updateUser with non-existent id (PUT)")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     void testUpdateUserErrorWithNonExistentId() throws Exception {
-        UserDto update = new UserDto(null,"john123",true,"user");
+        UserDto update = new UserDto(null, "john123", true, "user");
         String json = objectMapper.writeValueAsString(update);
 
         mvc.perform(

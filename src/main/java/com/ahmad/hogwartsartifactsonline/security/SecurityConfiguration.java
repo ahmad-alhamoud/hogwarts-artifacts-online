@@ -40,10 +40,11 @@ public class SecurityConfiguration {
 
     private final RSAPrivateKey privateKey;
 
-    public SecurityConfiguration(CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint, CustomBearerTokenAuthenticationEntryPoint customBearerTokenAuthenticationEntryPoint, CustomBearerTokenAccessDeniedHandler customBearerTokenAccessDeniedHandler) throws NoSuchAlgorithmException {
+    public SecurityConfiguration(CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint, CustomBearerTokenAuthenticationEntryPoint customBearerTokenAuthenticationEntryPoint, CustomBearerTokenAccessDeniedHandler customBearerTokenAccessDeniedHandler, UserRequestAuthorizationManager userRequestAuthorizationManager) throws NoSuchAlgorithmException {
         this.customBasicAuthenticationEntryPoint = customBasicAuthenticationEntryPoint;
         this.customBearerTokenAuthenticationEntryPoint = customBearerTokenAuthenticationEntryPoint;
         this.customBearerTokenAccessDeniedHandler = customBearerTokenAccessDeniedHandler;
+        this.userRequestAuthorizationManager = userRequestAuthorizationManager;
         // Generate a public/private key pair.
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
@@ -62,6 +63,8 @@ public class SecurityConfiguration {
 
     private final CustomBearerTokenAccessDeniedHandler customBearerTokenAccessDeniedHandler;
 
+    private final UserRequestAuthorizationManager userRequestAuthorizationManager;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -69,9 +72,10 @@ public class SecurityConfiguration {
                         authorizeHttpRequests -> authorizeHttpRequests
                                 .requestMatchers(HttpMethod.GET, baseUrl + "/artifacts/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,baseUrl + "/artifacts/search").permitAll()
-                                .requestMatchers(HttpMethod.GET, baseUrl + "/users/**").hasAuthority("ROLE_admin")
+                                .requestMatchers(HttpMethod.GET, baseUrl + "/users").hasAuthority("ROLE_admin")
+                                .requestMatchers(HttpMethod.GET, baseUrl + "/users/**").access(userRequestAuthorizationManager) // The authorization role is defined in the UserRequestAuthorizationManager.
                                 .requestMatchers(HttpMethod.POST, baseUrl + "/users").hasAuthority("ROLE_admin")
-                                .requestMatchers(HttpMethod.PUT, baseUrl + "/users/**").hasAuthority("ROLE_admin")
+                                .requestMatchers(HttpMethod.PUT, baseUrl + "/users/**").access(userRequestAuthorizationManager)
                                 .requestMatchers(HttpMethod.DELETE, baseUrl + "/users/**").hasAuthority("ROLE_admin")
                                 .requestMatchers(EndpointRequest.to("health", "info","prometheus")).permitAll()
                                 .requestMatchers(EndpointRequest.toAnyEndpoint().excluding("health", "info","prometheus")).hasAuthority("ROLE_admin")

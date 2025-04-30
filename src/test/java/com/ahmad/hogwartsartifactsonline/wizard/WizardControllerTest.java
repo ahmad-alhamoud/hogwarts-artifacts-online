@@ -1,5 +1,6 @@
 package com.ahmad.hogwartsartifactsonline.wizard;
 
+import com.ahmad.hogwartsartifactsonline.client.rediscache.RedisCacheClient;
 import com.ahmad.hogwartsartifactsonline.system.StatusCode;
 import com.ahmad.hogwartsartifactsonline.system.exception.ObjectNotFoundException;
 import com.ahmad.hogwartsartifactsonline.wizard.dto.WizardDto;
@@ -37,6 +38,9 @@ class WizardControllerTest {
 
     @MockitoBean
     WizardService wizardService;
+
+    @MockitoBean
+    RedisCacheClient redisCacheClient;
 
     List<WizardDto> wizardDtoList;
     List<Wizard> wizards;

@@ -24,3 +24,7 @@ services:
     image: openzipkin/zipkin:2.24.0
     ports:
       - 9411:9411
+  redis:
+    image: redis
+    ports:
+      - 6379:6379

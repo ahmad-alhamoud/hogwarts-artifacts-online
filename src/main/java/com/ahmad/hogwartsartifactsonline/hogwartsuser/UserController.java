@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("${api.endpoint.base-url}/users")
@@ -56,10 +57,19 @@ public class UserController {
     }
 
     @PostMapping
-    public Result addUser(@RequestBody  @Valid HogwartsUser newHogwartsUser) {
+    public Result addUser(@RequestBody @Valid HogwartsUser newHogwartsUser) {
         HogwartsUser savedUser = userService.save(newHogwartsUser);
         UserDto savedUserDto = userToUserDtoConverter.convert(savedUser);
         return new Result(true, StatusCode.SUCCESS, "Add Success", savedUserDto);
+    }
+
+    @PatchMapping("/{userId}/password")
+    public Result changePassword(@PathVariable Integer userId, @RequestBody Map<String, String> passwordMap) {
+        String oldPassword = passwordMap.get("oldPassword");
+        String newPassword = passwordMap.get("newPassword");
+        String confirmNewPassword = passwordMap.get("confirmNewPassword");
+        userService.changePassword(userId, oldPassword, newPassword, confirmNewPassword);
+        return new Result(true, StatusCode.SUCCESS, "Password Changed Success", null);
     }
 
 }

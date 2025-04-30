@@ -1,11 +1,13 @@
 package com.ahmad.hogwartsartifactsonline.hogwartsuser;
 
+import com.ahmad.hogwartsartifactsonline.client.rediscache.RedisCacheClient;
 import com.ahmad.hogwartsartifactsonline.hogwartsuser.dto.UserDto;
 import com.ahmad.hogwartsartifactsonline.system.StatusCode;
 import com.ahmad.hogwartsartifactsonline.system.exception.ObjectNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,9 @@ class UserControllerTest {
 
     @MockitoBean
     UserService userService;
+
+    @MockitoBean
+    RedisCacheClient redisCacheClient;
 
     @Autowired
     MockMvc mvc;

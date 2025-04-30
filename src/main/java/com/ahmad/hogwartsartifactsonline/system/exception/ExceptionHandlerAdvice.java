@@ -123,6 +123,14 @@ public class ExceptionHandlerAdvice {
         return new Result(false, StatusCode.INTERNAL_SERVER_ERROR, exception.getMessage(), exception.getCause());
     }
 
+    @ExceptionHandler(PasswordChangeIllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    Result handlePasswordChangeIllegalArgumentException(PasswordChangeIllegalArgumentException exception) {
+        return new Result(false, StatusCode.INVALID_ARGUMENT, exception.getMessage());
+    }
+
+
+
     /*
         Fallback handles any unhandled  exceptions.
     */

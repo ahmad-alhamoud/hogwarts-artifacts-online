@@ -140,6 +140,10 @@
             <groupId>com.azure.spring</groupId>
             <artifactId>spring-cloud-azure-starter-data-redis-lettuce</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

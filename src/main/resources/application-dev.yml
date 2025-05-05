@@ -20,6 +20,8 @@ spring:
     redis:
       host: localhost
       port: 6379
+  flyway:
+    enabled: false
 ai:
   openai:
     endpoint: ${AI_OPENAI_ENDPOINT:https://api.openai.com/v1/chat/completions}
